@@ -1,5 +1,5 @@
 import { Listener } from "@sapphire/framework";
-import { EmbedBuilder, Interaction, Colors, ButtonInteraction } from "discord.js";
+import { EmbedBuilder, Interaction, Colors, MessageFlags } from "discord.js";
 
 export class RoleSelectListener extends Listener {
   public constructor(
@@ -14,8 +14,7 @@ export class RoleSelectListener extends Listener {
 
   public async run(interaction: Interaction) {
     if (!interaction.isButton()) return;
-    
-    // Check if the button interaction is for role selection
+
     if (!interaction.customId.startsWith("role-")) return;
 
     const roleMap: Record<string, string> = {
@@ -91,9 +90,13 @@ export class RoleSelectListener extends Listener {
         iconURL: interaction.user.displayAvatarURL(),
       });
 
+    console.log(
+      `Role ${roleName} ${action} untuk ${interaction.user.tag} (${interaction.user.id})`
+    );
+
     return interaction.reply({
       embeds: [embed],
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
   }
 }
