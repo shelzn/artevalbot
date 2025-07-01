@@ -1,5 +1,5 @@
 import { Listener } from "@sapphire/framework";
-import { EmbedBuilder, Interaction, Colors } from "discord.js";
+import { EmbedBuilder, Interaction, Colors, ButtonInteraction } from "discord.js";
 
 export class RoleSelectListener extends Listener {
   public constructor(
@@ -13,16 +13,18 @@ export class RoleSelectListener extends Listener {
   }
 
   public async run(interaction: Interaction) {
-    if (!interaction.isStringSelectMenu()) return;
-    if (interaction.customId !== "select-game-role") return;
+    if (!interaction.isButton()) return;
+    
+    // Check if the button interaction is for role selection
+    if (!interaction.customId.startsWith("role-")) return;
 
     const roleMap: Record<string, string> = {
-      minecraft: "MINECRAFT",
-      valorant: "VALORANT",
-      pubgm: "PUBG",
-      ml: "MLBB",
-      hok: "HOK",
-      ff: "FREEFIRE",
+      "role-minecraft": "MINECRAFT",
+      "role-valorant": "VALORANT",
+      "role-pubgm": "PUBG",
+      "role-ml": "MLBB",
+      "role-hok": "HOK",
+      "role-ff": "FREEFIRE",
     };
 
     const member = await interaction.guild?.members.fetch(interaction.user.id);
@@ -33,28 +35,41 @@ export class RoleSelectListener extends Listener {
       });
     }
 
-    const added: string[] = [];
-    const removed: string[] = [];
+    const roleName = roleMap[interaction.customId];
+    if (!roleName) {
+      return interaction.reply({
+        content: "❌ Role tidak ditemukan.",
+        ephemeral: true,
+      });
+    }
 
-    for (const value of interaction.values) {
-      const roleName = roleMap[value];
-      const role = interaction.guild?.roles.cache.find(
-        (r) => r.name === roleName
-      );
+    const role = interaction.guild?.roles.cache.find(
+      (r) => r.name === roleName
+    );
 
-      if (!role) continue;
+    if (!role) {
+      return interaction.reply({
+        content: `❌ Role ${roleName} tidak ditemukan di server.`,
+        ephemeral: true,
+      });
+    }
 
-      if (member.roles.cache.has(role.id)) {
-        await member.roles.remove(role);
-        removed.push(role.toString());
-      } else {
-        await member.roles.add(role);
-        added.push(role.toString());
-      }
+    let action: string;
+    let added: string[] = [];
+    let removed: string[] = [];
+
+    if (member.roles.cache.has(role.id)) {
+      await member.roles.remove(role);
+      removed.push(role.toString());
+      action = "dihapus";
+    } else {
+      await member.roles.add(role);
+      added.push(role.toString());
+      action = "ditambahkan";
     }
 
     const embed = new EmbedBuilder()
-      .setTitle("User roles updated")
+      .setTitle("Role Updated")
       .setColor(Colors.Green)
       .addFields(
         {
