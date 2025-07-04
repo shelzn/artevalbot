@@ -3,7 +3,10 @@ import {
   SlashCommandBuilder,
   ChatInputCommandInteraction,
   ActionRowBuilder,
-  StringSelectMenuBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  EmbedBuilder,
+  Colors,
 } from "discord.js";
 
 export class SelectRoleCommand extends Command {
@@ -16,57 +19,53 @@ export class SelectRoleCommand extends Command {
   }
 
   public override async chatInputRun(interaction: ChatInputCommandInteraction) {
-    const selectMenu = new StringSelectMenuBuilder()
-      .setCustomId("select-game-role")
-      .setPlaceholder("Pilih Game Role kamu disini!")
-      .setMinValues(1)
-      .setMaxValues(6)
-      .addOptions(
-        {
-          label: "Minecraft",
-          value: "minecraft",
-          emoji: "<:minecraft:1389414456525721640>",
-          description: "Klik disini untuk mendapatkan role Minecraft",
-        },
-        {
-          label: "Valorant",
-          value: "valorant",
-          emoji: "<:valorant:1389415976986083428>",
-          description: "Klik disini untuk mendapatkan role Valorant",
-        },
-        {
-          label: "PUBG Mobile",
-          value: "pubgm",
-          emoji: "<:pubgm:1389415973823447080>",
-          description: "Klik disini untuk mendapatkan role PUBG Mobile",
-        },
-        {
-          label: "Mobile Legends",
-          value: "ml",
-          emoji: "<:mlbb:1389415967435526246>",
-          description: "Klik disini untuk mendapatkan role Mobile Legends",
-        },
-        {
-          label: "Honor of Kings",
-          value: "hok",
-          emoji: "<:hok:1389415963849392129>",
-          description: "Klik disini untuk mendapatkan role Honor of Kings",
-        },
-        {
-          label: "Free Fire",
-          value: "ff",
-          emoji: "<:freefire:1389415960577970297>",
-          description: "Klik disini untuk mendapatkan role Free Fire",
-        }
-      );
-
-    const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
-      selectMenu
+    const row1 = new ActionRowBuilder<ButtonBuilder>().addComponents(
+      new ButtonBuilder()
+        .setCustomId("role-minecraft")
+        .setLabel("Minecraft")
+        .setEmoji("<:minecraft:1389414456525721640>")
+        .setStyle(ButtonStyle.Secondary),
+      new ButtonBuilder()
+        .setCustomId("role-valorant")
+        .setLabel("Valorant")
+        .setEmoji("<:valorant:1389415976986083428>")
+        .setStyle(ButtonStyle.Secondary),
+      new ButtonBuilder()
+        .setCustomId("role-pubgm")
+        .setLabel("PUBG Mobile")
+        .setEmoji("<:pubgm:1389415973823447080>")
+        .setStyle(ButtonStyle.Secondary)
     );
 
+    const row2 = new ActionRowBuilder<ButtonBuilder>().addComponents(
+      new ButtonBuilder()
+        .setCustomId("role-ml")
+        .setLabel("Mobile Legends")
+        .setEmoji("<:mlbb:1389415967435526246>")
+        .setStyle(ButtonStyle.Secondary),
+      new ButtonBuilder()
+        .setCustomId("role-hok")
+        .setLabel("Honor of Kings")
+        .setEmoji("<:hok:1389415963849392129>")
+        .setStyle(ButtonStyle.Secondary),
+      new ButtonBuilder()
+        .setCustomId("role-ff")
+        .setLabel("Free Fire")
+        .setEmoji("<:freefire:1389415960577970297>")
+        .setStyle(ButtonStyle.Secondary)
+    );
+
+    const embed = new EmbedBuilder()
+      .setTitle("Games Role")
+      .setDescription("**Silahkan pilih roles sesuai dengan Game kesukaan mu**")
+      .setColor(Colors.Blue)
+      .setFooter({
+        text: "Copyright © ArtevalClan | @shelzndev",
+      });
+
     await interaction.reply({
-      content: "Silahkan pilih roles sesuai dengan Game kesukaan mu",
-      components: [row],
+      embeds: [embed],
+      components: [row1, row2],
     });
   }
 }
